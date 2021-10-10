@@ -26,6 +26,10 @@ class AgendasController < ApplicationController
     if current_user = @agenda.user || current_user == @agenda.team.owner
       @agenda.destroy
       redirect_to dashboard_url, notice: I18n.t('views.messages.delete_agenda')
+      @users = @agenda.team.members
+      @users.each do |user|
+        AgendaMailer.agenda_mail(user.email).deliver
+      end
     else
       redirect_to dashboard_url, notice: I18n.t('views.messages.cannot_delete_member_4_some_reason')
     end
